@@ -1,5 +1,5 @@
 {
-  "name": "vespera-ftp-sync",
+  "name": "vespera-sync-js",
   "version": "0.1.0",
   "main": "index.js",
   "description": "A tool designed to synchronize files from the Vespera telescope using FTP. It allows for seamless and automated transfer of telescope data to a local directory, featuring concurrent downloads, customizable intervals, and file type filtering.",
@@ -43,7 +43,7 @@
     "start": "node index.js"
   },
   "bin": {
-    "vespera-ftp-sync": "index.js"
+    "vespera-sync": "index.js"
   },
   "pkg": {
     "targets": [
