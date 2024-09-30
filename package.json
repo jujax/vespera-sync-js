@@ -6,6 +6,7 @@
   "repository": "git@github.com:jujax/vespera-scraping.git",
   "author": "Julien Pelletier <github.twister793@simplelogin.fr>",
   "license": "GPL-3.0-only",
+  "private": true,
   "keywords": [
     "Vespera",
     "Vaonis",
