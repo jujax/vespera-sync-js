@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.1.2](https://github.com/jujax/vespera-scraping/compare/release-v0.1.1...release-v0.1.2) (2024-09-30)
+
 ## 0.1.1 (2024-09-30)
 
 

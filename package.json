@@ -1,6 +1,6 @@
 {
   "name": "vespera-sync-js",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "main": "index.js",
   "description": "A tool designed to synchronize files from the Vespera telescope using FTP. It allows for seamless and automated transfer of telescope data to a local directory, featuring concurrent downloads, customizable intervals, and file type filtering.",
   "repository": "git@github.com:jujax/vespera-scraping.git",
@@ -33,13 +33,13 @@
   },
   "lint-staged": {
     "*.js": [
-      "prettier --write",
+      "prettier --write *.js",
       "git add"
     ]
   },
   "scripts": {
     "prepare": "husky",
-    "format": "prettier --write .",
+    "format": "prettier --write *.js",
     "start": "node index.js"
   },
   "bin": {

@@ -27,18 +27,21 @@ jobs:
       - name: Install pkg
         run: yarn global add pkg
 
-      # étape 4bis : Récupérer la version de l'application
+      # étape 5 : Récupérer la version de l'application
       - name: Get version
         id: get_version
-        run: echo ::set-output name=version::$(node -p "require('./package.json').version")
+        run: |
+          echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+          echo "changelog=$(git log --pretty=format:"%h %s" $(git describe --tags --abbrev=0 @^)..@)" >> $GITHUB_OUTPUT 
 
-      # Étape 5 : Construire les binaires avec pkg pour Linux et macOS
+
+      # Étape 6 : Construire les binaires avec pkg pour Linux et macOS
       - name: Build binaries with pkg
         run: |
           echo ${{ steps.get_version.outputs.version }}
           pkg . --targets node18-linux-x64,node18-linux-arm64,node18-macos-arm64
 
-      # Étape 6 : Créer une nouvelle release GitHub
+      # Étape 7 : Créer une nouvelle release GitHub
       - name: Create GitHub Release
         id: create_release
         uses: softprops/action-gh-release@v1
@@ -48,7 +51,7 @@ jobs:
           name: v${{ steps.get_version.outputs.version }}
           body: |
             ## Changelog
-            $(git log --pretty=format:"%h %s" $(git describe --tags --abbrev=0 @^)..@)
+            ${{ steps.get_version.outputs.changelog }}
           with:
           files: |
             ./dist/*
