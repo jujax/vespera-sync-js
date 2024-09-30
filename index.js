@@ -31,11 +31,11 @@ program
   .option("-s, --secure", "Use secure FTP connection", false) // Default: unsecured FTP
   .option("-d, --daemon", "Run in daemon mode (run in the background)", false) // Option for daemon mode
   .option("-i, --interval <seconds>", "Synchronization interval (seconds)", 10) // Interval in seconds
-  // .option(
-  //     "-f, --file-types <types>",
-  //     "File extensions to download (e.g., tif,jpg)",
-  //     "tif,tiff,jpg,jpeg,png"
-  // ) // Default file extensions: tiff, jpeg, png
+  .option(
+    "-f, --file-types <types>",
+    "File extensions to download (e.g., tif,jpg)",
+    "tif,tiff,jpg,jpeg,png,fits"
+  ) // Default file extensions: tiff, jpeg, png
   .option(
     "-c, --concurrency <concurrencyNumber>",
     "Max concurrent downloads",
@@ -108,11 +108,19 @@ async function scanRemoteDirectory(client, remoteDir) {
       if (file.isDirectory) {
         await recurseDirectory(fullPath);
       } else {
-        fileList.push({
-          name: fullPath,
-          size: file.size,
-          date: file.modifiedAt,
-        });
+        // Récupérer l'extension du fichier, meme les .tar.gz par exemple
+        const extension = fullPath.match(/(?<=\.).+/);
+        if (
+          extension &&
+          extension[0] &&
+          options.fileTypes.split(",").includes(extension[0])
+        ) {
+          fileList.push({
+            name: fullPath,
+            size: file.size,
+            date: file.modifiedAt,
+          });
+        }
       }
     }
   }
