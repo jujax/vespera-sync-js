@@ -1,11 +1,12 @@
 {
   "name": "vespera-ftp-sync",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "main": "index.js",
   "description": "A tool designed to synchronize files from the Vespera telescope using FTP. It allows for seamless and automated transfer of telescope data to a local directory, featuring concurrent downloads, customizable intervals, and file type filtering.",
   "repository": "git@github.com:jujax/vespera-scraping.git",
   "author": "Julien Pelletier <github.twister793@simplelogin.fr>",
   "license": "GPL-3.0-only",
+  "private": true,
   "keywords": [
     "Vespera",
     "Vaonis",
@@ -20,10 +21,12 @@
   ],
   "dependencies": {
     "basic-ftp": "^5.0.5",
-    "commander": "^12.1.0",
-    "fs-extra": "^11.2.0"
+    "commander": "^12.1.0"
   },
   "devDependencies": {
+    "@release-it/conventional-changelog": "^8.0.2",
+    "cz-conventional-changelog": "^3.3.0",
+    "release-it": "^17.6.0",
     "husky": "^8.0.0",
     "lint-staged": "^15.2.10",
     "prettier": "^3.3.3"
