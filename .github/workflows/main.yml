@@ -47,7 +47,8 @@ jobs:
           # retrouver la version dans package.json
           name: v${{ steps.get_version.outputs.version }}
           body: |
-            Release generated automatically by GitHub Actions.
+            ## Changelog
+            $(git log --pretty=format:"%h %s" $(git describe --tags --abbrev=0 @^)..@)
           with:
           files: |
             ./dist/*

@@ -4,11 +4,6 @@ const path = require("path");
 const { Command } = require("commander");
 const version = require("./package.json").version;
 
-const ftpHost = "10.0.0.1"; // Remplacez par votre hôte FTP
-const ftpUser = "anonymous"; // Remplacez par votre utilisateur FTP
-const ftpPassword = "anonymous"; // Remplacez par votre mot de passe FTP
-const remoteDir = "/system"; // Dossier distant à scanner
-const localDir = "./ftp"; // Dossier local à comparer
 const clients = [];
 const client = new ftp.Client();
 
@@ -17,7 +12,7 @@ const program = new Command();
 program
   .version(version)
   .description(
-    `Vespera-ftp-sync v${version} - Synchronize your Vespera FTP server with a local directory`
+    `Vespera-sync v${version} - Synchronize your Vespera FTP server with a local directory`
   )
   .option("-h, --host <host>", "FTP server address", "10.0.0.1") // Default: 10.0.0.1
   .option("-u, --user <username>", "FTP username", "anonymous") // Default: anonymous user
@@ -52,7 +47,7 @@ async function main(options) {
     await connectToFtp(
       client,
       options.host,
-      options.usernmae,
+      options.username,
       options.password
     );
     const remoteFiles = await scanRemoteDirectory(client, options.remoteDir);
