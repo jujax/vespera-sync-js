@@ -30,8 +30,8 @@ jobs:
       - name: Extract Changelog for latest version
         id: changelog
         run: |
-          changelog=$(awk '/^## \[/{if (found) exit} {print} /^## \['${{ steps.get_version.outputs.version }}'\]/ {found=1}' CHANGELOG.md)
-          echo "changelog=$changelog" >> $GITHUB_OUTPUT
+          awk '/^## \[/{if (found) exit} {print} /^## \['${{ steps.get_version.outputs.version }}'\]/ {found=1}' CHANGELOG.md > latest_changelog.md
+
 
       - name: Build binaries with pkg
         run: |
@@ -44,9 +44,7 @@ jobs:
         with:
           tag_name: v${{ steps.get_version.outputs.version }}
           name: v${{ steps.get_version.outputs.version }}
-          body: |
-            ## Changelog
-            ${{ steps.get_version.outputs.changelog }}
+          body_path: latest_changelog.md
           with:
           files: |
             ./dist/*
