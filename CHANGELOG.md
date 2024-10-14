@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/jujax/vespera-scraping/compare/release-v0.1.3...release-v0.1.4) (2024-10-14)
+
+
+### Bug Fixes
+
+* Gérer la limite de concurrence lors du téléchargement des fichiers ([c43afb2](https://github.com/jujax/vespera-scraping/commit/c43afb2df62e1ed254031ad5dd421e6795fd5527))
+
 ## [0.1.3](https://github.com/jujax/vespera-scraping/compare/release-v0.1.2...release-v0.1.3) (2024-09-30)
 
 

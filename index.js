@@ -211,10 +211,16 @@ async function downloadFilesWithLimit(
 
   // Fonction pour gérer le pool de promesses
   async function enqueueFile(file) {
+    // Attendre qu'une tâche se termine si on atteint la limite de concurrence
+    while (activePromises.length >= parallelLimit) {
+      await Promise.race(activePromises);
+    }
+    // Créer et lancer la promesse de téléchargement après avoir vérifié la limite
     const downloadPromise = downloadFile(file).then(() => {
       // Une fois le téléchargement terminé, on retire cette promesse active
       activePromises = activePromises.filter((p) => p !== downloadPromise);
     });
+
     activePromises.push(downloadPromise);
 
     // Si on atteint la limite, attendre qu'une des promesses soit résolue

@@ -6,50 +6,45 @@ on:
 jobs:
   build:
     name: Build and release binaries
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
-      # Étape 1 : Checkout le dépôt
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Étape 2 : Installer Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: "18"
 
-      # Étape 3 : Installer les dépendances
       - name: Install dependencies
         run: yarn
 
-      # Étape 4 : Installer pkg
       - name: Install pkg
         run: yarn global add pkg
 
-      # étape 5 : Récupérer la version de l'application
       - name: Get version
         id: get_version
         run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
+      - name: Extract Changelog for latest version
+        id: changelog
+        run: |
+          awk '/^## \[/{if (found) exit} {print} /^## \['${{ steps.get_version.outputs.version }}'\]/ {found=1}' CHANGELOG.md > latest_changelog.md
 
-      # Étape 6 : Construire les binaires avec pkg pour Linux et macOS
+
       - name: Build binaries with pkg
         run: |
           echo ${{ steps.get_version.outputs.version }}
           pkg . --targets node18-linux-x64,node18-linux-arm64,node18-macos-arm64
 
-      # Étape 7 : Créer une nouvelle release GitHub
       - name: Create GitHub Release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ steps.get_version.outputs.version }} # Utiliser le hash du commit comme nom de tag
-          # retrouver la version dans package.json
+          tag_name: v${{ steps.get_version.outputs.version }}
           name: v${{ steps.get_version.outputs.version }}
-          body: |
-            ## Changelog
-            ${{ steps.get_version.outputs.changelog }}
+          body_path: latest_changelog.md
           with:
           files: |
             ./dist/*
