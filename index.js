@@ -6,7 +6,7 @@ const version = require("./package.json").version;
 const wifi = require('node-wifi');
 
 wifi.init({
-  iface: null
+  iface: "wlan0"
 });
 
 const clients = [];
@@ -92,7 +92,7 @@ async function main(options) {
       filesToDownload,
       options.localDir,
       options.remoteDir,
-      options.concurrencyNumber
+      options.concurrency
     );
   } catch (err) {
     console.error("Erreur :", err);
@@ -209,9 +209,9 @@ async function downloadFilesWithLimit(
     clients.push(downloadClient);
     try {
       await downloadClient.access({
-        host: ftpHost,
-        user: ftpUser,
-        password: ftpPassword,
+        host: options.host,
+        user: options.user,
+        password: options.password,
         secure: false, // Si votre serveur FTP supporte TLS, mettez true
       });
       const localFilePath = path.join(
@@ -228,12 +228,9 @@ async function downloadFilesWithLimit(
     } catch (e) {
       console.error(e);
       if (e.code === 421) {
-        clients.map((client) => {
-          client.close();
-        });
-        client.close();
-        console.error("All sockets closed, relaunch program");
-        process.exit(1);
+        downloadClient.close();
+        parallelLimit--;
+        enqueueFile(file);
       }
     }
   }
@@ -270,6 +267,7 @@ async function downloadFilesWithLimit(
 async function connectToVespera() {
   try {
     const networks = await wifi.scan();
+    previousNetwork = await wifi.getCurrentConnections();
     const vesperaNetwork = networks.find(network => network.ssid.startsWith('vespera'));
 
     if (vesperaNetwork) {
@@ -279,7 +277,7 @@ async function connectToVespera() {
       console.log('Connecté au réseau Vespera avec succès !');
     } else {
       console.log('Aucun réseau Vespera trouvé.');
-      reconnectToPrevious();
+      //      reconnectToPrevious();
     }
   } catch (err) {
     console.error('Erreur lors de la connexion à Vespera:', err);
