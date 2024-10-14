@@ -3,6 +3,11 @@ const fs = require("fs");
 const path = require("path");
 const { Command } = require("commander");
 const version = require("./package.json").version;
+const wifi = require('node-wifi');
+
+wifi.init({
+  iface: null
+});
 
 const clients = [];
 const client = new ftp.Client();
@@ -35,7 +40,20 @@ program
     "-c, --concurrency <concurrencyNumber>",
     "Max concurrent downloads",
     9
-  ); // Limit the number of concurrent downloads (default: 5)
+  ) // Limit the number of concurrent downloads (default: 5)
+  .option(
+    "-ws, --ssid <ssid>",
+    "SSID of the wifi network to connect to"
+  ) // SSID of the wifi network to connect to
+  .option(
+    "-wp, --wifi-password <password>",
+    "Password of the wifi network to connect to"
+  )
+  .option(
+    "-ad, --auto-discover",
+    "Auto discover the vespera Wifi network",
+    true
+  );
 
 program.parse(process.argv);
 
@@ -43,6 +61,17 @@ program.parse(process.argv);
 const options = program.opts();
 
 async function main(options) {
+  try {
+    if (options.ssid && options.wifiPassword) {
+      await connectManually(options.ssid, options.wifiPassword);
+    } else if (options.autoDiscover) {
+      await connectToVespera();
+    }
+  }
+  catch (err) {
+    console.error("Erreur :", err);
+    await reconnectToPrevious();
+  }
   try {
     await connectToFtp(
       client,
@@ -237,5 +266,50 @@ async function downloadFilesWithLimit(
   // Attendre que tous les téléchargements soient terminés
   await Promise.all(activePromises);
 }
+
+async function connectToVespera() {
+  try {
+    const networks = await wifi.scan();
+    const vesperaNetwork = networks.find(network => network.ssid.startsWith('vespera'));
+
+    if (vesperaNetwork) {
+      console.log(`Connexion au réseau : ${vesperaNetwork.ssid}`);
+      previousNetwork = await wifi.getCurrentConnections(); // Sauvegarder le réseau actuel
+      await wifi.connect({ ssid: vesperaNetwork.ssid });
+      console.log('Connecté au réseau Vespera avec succès !');
+    } else {
+      console.log('Aucun réseau Vespera trouvé.');
+      reconnectToPrevious();
+    }
+  } catch (err) {
+    console.error('Erreur lors de la connexion à Vespera:', err);
+  }
+}
+
+async function connectManually(ssid, password) {
+  try {
+    previousNetwork = await wifi.getCurrentConnections(); // Sauvegarder le réseau actuel
+    await wifi.connect({ ssid, password });
+    console.log(`Connecté au réseau ${ssid} avec succès !`);
+  } catch (err) {
+    console.error('Erreur lors de la connexion manuelle:', err);
+  }
+}
+
+async function reconnectToPrevious() {
+  try {
+    if (previousNetwork && previousNetwork.length > 0) {
+      const { ssid, password } = previousNetwork[0];
+      console.log(`Reconnexion à l'ancien réseau : ${ssid}`);
+      await wifi.connect({ ssid, password });
+      console.log(`Reconnecté à ${ssid} avec succès !`);
+    } else {
+      console.log('Aucun réseau précédent disponible pour la reconnexion.');
+    }
+  } catch (err) {
+    console.error('Erreur lors de la reconnexion au réseau précédent:', err);
+  }
+}
+
 
 main(options);
